@@ -1,0 +1,73 @@
+from pyspark.sql import SparkSession
+from pyspark.ml.feature import VectorAssembler, StringIndexer
+from pyspark.ml.classification import DecisionTreeClassifier
+from pyspark.ml.evaluation import BinaryClassificationEvaluator, MulticlassClassificationEvaluator
+from pyspark.ml import Pipeline
+import matplotlib.pyplot as plt
+
+# 1. Start Spark Session
+spark = SparkSession.builder.appName("PurchasePrediction").getOrCreate()
+
+
+
+data = spark.read.csv("/FileStore/tables/purchasedata.csv", header=True, inferSchema=True)
+data.printSchema()
+data.show(5)
+
+
+categorical_cols = [col for col, dtype in data.dtypes if dtype == 'string']
+numeric_cols = [col for col, dtype in data.dtypes if dtype != 'string' and col != 'Purchased']
+
+
+indexers = [StringIndexer(inputCol=col, outputCol=col + "_index") for col in categorical_cols]
+
+
+assembler_inputs = [col + "_index" for col in categorical_cols] + numeric_cols
+assembler = VectorAssembler(inputCols=assembler_inputs, outputCol="features")
+
+label_indexer = StringIndexer(inputCol="Purchased", outputCol="label")
+
+
+dt = DecisionTreeClassifier(featuresCol="features", labelCol="label")
+
+
+dt = DecisionTreeClassifier(featuresCol="features", labelCol="label", maxBins=200)
+
+pipeline = Pipeline(stages=indexers + [label_indexer, assembler, dt])
+model = pipeline.fit(data)
+
+
+predictions = model.transform(data)
+predictions.select("Purchased", "prediction", "probability").show(5)
+
+
+evaluator_auc = BinaryClassificationEvaluator(labelCol="label", metricName="areaUnderROC")
+evaluator_acc = MulticlassClassificationEvaluator(labelCol="label", metricName="accuracy")
+
+
+
+auc = evaluator_auc.evaluate(predictions)
+accuracy = evaluator_acc.evaluate(predictions)
+
+print(f"AUC: {auc}")
+print(f"Accuracy: {accuracy}")
+
+
+predictions.groupBy("label", "prediction").count().show()
+
+
+tree_model = model.stages[-1]  # The DecisionTreeClassifier is the last in pipeline
+print("Feature Importances:")
+for name, score in zip(assembler_inputs, tree_model.featureImportances):
+    print(f"{name}: {score}")
+
+
+# 9. Visualization: Pie chart of Purchase vs No-Purchase
+purchase_counts = predictions.groupBy("prediction").count().toPandas()
+labels = ["No Purchase", "Purchase"]
+sizes = purchase_counts["count"].tolist()
+
+plt.pie(sizes, labels=labels, autopct='%1.1f%%', colors=['lightcoral', 'lightskyblue'], startangle=140)
+plt.axis('equal')
+plt.title("Prediction Results")
+plt.show()
