@@ -130,10 +130,6 @@ The dataset is used to analyze and predict customer purchase completion based on
 - `datasets.csv`: Dataset used for the project.
 - `README.md`: Project documentation.
 
-## License
-
-[Specify the license, e.g., MIT License]
-
 ## Acknowledgements
 
 I would like to express my sincere gratitude to Professor Saqib UL Sabha, Lovely Professional University, and my friends and family for their invaluable support and guidance throughout this project.
