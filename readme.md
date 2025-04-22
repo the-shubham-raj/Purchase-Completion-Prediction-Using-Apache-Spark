@@ -100,8 +100,7 @@ The dataset is used to analyze and predict customer purchase completion based on
 
 1.  Clone the repository:
     ```
-    git clone [repository-url]
-    cd [repository-directory]
+    git clone https://github.com/the-shubham-raj/Purchase-Completion-Prediction-Using-Apache-Spark.git
     ```
 2.  Install the required Python packages:
     ```
@@ -115,10 +114,6 @@ The dataset is used to analyze and predict customer purchase completion based on
 2.  Open the Databricks notebook (`pyspark.txt`) in your Databricks environment.
 3.  Run the notebook cells to execute the data processing, model training, and evaluation pipeline.
 4.  View the visualizations and performance metrics to analyze the results.
-
-## Observations & Insights
-
-[Provide key observations and insights gained from the project]
 
 ## Bibliography
 
