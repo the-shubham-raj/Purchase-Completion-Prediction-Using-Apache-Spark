@@ -145,5 +145,5 @@ I would like to express my sincere gratitude to Professor Saqib UL Sabha, Lovely
 
 ## Contact
 
-Shubham
-[the.shubham.raj@outlook.com]
+Shubham Raj
+the.shubham.raj@outlook.com
